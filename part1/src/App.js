@@ -34,14 +34,4 @@ const App = () => {
     )
 }
 
-const Display = (props) => {
-    return (
-        <div>{props.counter}</div>
-    )
-}
-
-const Button = (props) => {
-    return <button onClick={props.handleClick}>{props.text}</button>
-}
-
 export default App
