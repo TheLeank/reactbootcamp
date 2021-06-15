@@ -1,29 +1,40 @@
 import React, { useState } from 'react'
 
 const App = () => {
-    // El estado puede ser cualquier tipo de estructura de datos. Pasamos de
-    // usar int a object
-    const [clicks, setClicks] = useState({
-        left: 0,
-        right: 0
-    })
+    const [left, setLeft] = useState(0)
+    const [right, setRight] = useState(0)
+    // Esta vez el estado es un array, en el cuál almacenaremos cada click que
+    // realicemos en los botones left y right
+    const [allClicks, setAll] = useState([])
 
-    // Usamos spread operator (...) para crear una copia del objeto (clicks)
-    // con sus valores actuales, y modificamos la propiedad deseada
     const handleLeftClick = () => {
-        setClicks({...clicks, left: clicks.left + 1})
+        // Además de aumentar el contador left, concatenamos la letra 
+        // correspondiente. Importante: en react no se mutan los datos, sino que
+        // se crean nuevos objetos añadiendo la nueva información. concat
+        // devuelve un nuevo array al que se añade L, pero no modifica
+        // directamente el valor de allClicks. De esto se encarga su función
+        // setAll
+
+        // En javascript también es posible usar allClicks.push('L') y
+        // setAll(allClicks), y de hecho funciona en React, pero .push muta el
+        // array, lo cuál está prohibido en React ya que puede ocasionar 
+        // errores muy difíciles de depurar 
+        setAll(allClicks.concat('L'))
+        setLeft(left + 1)
     }
 
     const handleRightClick = () => {
-        setClicks({...clicks, right: clicks.right + 1})
+        setAll(allClicks.concat('R'))
+        setRight(right + 1)
     }
 
     return (
         <div>
-            {clicks.left}
+            {left}
             <button onClick={handleLeftClick}>left</button>
             <button onClick={handleRightClick}>right</button>
-            {clicks.right}
+            {right}
+            <p>{allClicks.join(' ')}</p>
         </div>
     )
 }
