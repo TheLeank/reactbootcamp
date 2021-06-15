@@ -1,30 +1,33 @@
-// Importamos useState
 import React, { useState } from 'react'
 
 const App = () => {
-    const [counter, setCounter] = useState(0)
+    // El estado puede ser cualquier tipo de estructura de datos. Pasamos de
+    // usar int a object
+    const [clicks, setClicks] = useState({
+        left: 0,
+        right: 0
+    })
 
-    const increaseByOne = () => setCounter(counter + 1)
-    const decreaseByOne = () => setCounter(counter - 1)
-    const setToZero = () => setCounter(0)
+    // Usamos spread operator (...) para crear una copia del objeto (clicks)
+    // con sus valores actuales, y modificamos la propiedad deseada
+    const handleLeftClick = () => {
+        setClicks({...clicks, left: clicks.left + 1})
+    }
+
+    const handleRightClick = () => {
+        setClicks({...clicks, right: clicks.right + 1})
+    }
 
     return (
         <div>
-            {/* Dado que ahora usamos componentes, el código es más corto
-            y legible */}
-            <Display counter={counter} />
-            <Button handleClick={increaseByOne} text="plus" />
-            <Button handleClick={decreaseByOne} text="minus" />
-            <Button handleClick={setToZero} text="zero" />
+            {clicks.left}
+            <button onClick={handleLeftClick}>left</button>
+            <button onClick={handleRightClick}>right</button>
+            {clicks.right}
         </div>
     )
 }
 
-// Creamos dos componentes, Display y Button, para poder reusarlos
-// Además, podemos usar desestructuración. Sabemos que usaremos la prop counter
-// por tanto podemos reemplazar (props) por ({ counter }) y así, usar dichos 
-// nombres dentro del componente. Recuerda que el orden de los props se define
-// por el orden en que son escritos los atributos al llamar al componente
 const Display = ({ counter }) => {
     return <div>{counter}</div>
 }
