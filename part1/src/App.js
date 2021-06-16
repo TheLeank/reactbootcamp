@@ -1,30 +1,74 @@
 import React, { useState } from 'react'
 
 const App = () => {
-    const [value, setValue] = useState(10)
+    const [feedback, setFeedback] = useState({
+        good: 0,
+        neutral: 0,
+        bad: 0,
+        all: 0
+    })
 
-    // Dado que el return es una sola declaración, podemos eliminar las
-    // variables, el return y sus llaves correspondientes. 
-    const hello = (who) => () => {
-         console.log('hello', who)
+    const handleGood = () => {
+        setFeedback({
+            ...feedback,
+            good: feedback.good + 1,
+            all: feedback.all + 1
+        })
     }
-
-    // Podemos usar estas funciones para establecer un valor dado en un estado
-    const setToValue = (newValue) => () => {
-        setValue(newValue)
+    
+    const handleNeutral = () => {
+        setFeedback({
+            ...feedback,
+            neutral: feedback.neutral + 1,
+            all: feedback.all + 1
+        })
     }
+    
+    const handleBad = () => {
+        setFeedback({
+            ...feedback,
+            bad: feedback.bad + 1,
+            all: feedback.all + 1
+        })
+    }   
 
     return (
         <div>
-            {value}
-            <button onClick={hello('world')}>world</button>
-            <button onClick={hello('react')}>react</button>
-            <button onClick={hello('function')}>function</button>
-            <button onClick={setToValue(1000)}>thousand</button>
-            <button onClick={setToValue(0)}>reset</button>
-            <button onClick={setToValue(value + 1)}>increment</button>
+            <h1>give feedback</h1>
+            <Button handleClick={handleGood} text='good' />
+            <Button handleClick={handleNeutral} text='neutral' />
+            <Button handleClick={handleBad} text='bad' />
+            <h1>statistics</h1>
+            <table>
+                <tbody>
+                    <Statistics text='good' value={feedback.good} />
+                    <Statistics text='neutral' value={feedback.neutral} />
+                    <Statistics text='bad' value={feedback.bad} />
+                    <Statistics text='all' value={feedback.all} />
+                    <Statistics text='average' value={(feedback.good - feedback.neutral) / feedback.all} />
+                    <Statistics text='positive' value={(feedback.good * 100) / feedback.all} />
+                </tbody>
+            </table>
         </div>
     )
 }
+
+const Button = ({ handleClick, text }) =>
+        <button onClick={handleClick}>{text}</button>
+    
+
+const Statistics = ({ text, value }) => {
+    if (value === 0) {
+        return <tr><td>No feedback given</td></tr>
+    }
+    
+    return (
+    <tr>
+        <td>{text}</td>
+        <td>{value}</td>
+    </tr>
+    )
+}
+
 
 export default App
