@@ -8,12 +8,20 @@ const App = () => {
 
   const handleAddPerson = (event) => {
     event.preventDefault()
-    const tempPerson = {
-      name: newName
+    // Comprobamos si en el estado ya existe un objeto cuyo name es el que 
+    // queremos guardar
+    if(!persons.find(p => p.name === newName)) {
+      const tempPerson = {
+        name: newName
+      }
+  
+      setPersons(persons.concat(tempPerson))
+      setNewName('')
+    } else {
+      // Usando template string para mostrar el valor de la variable. Notense
+      // las backquotes
+      alert(`${newName} is already added to phonebook`)
     }
-
-    setPersons(persons.concat(tempPerson))
-    setNewName('')
   }
 
   const handleNewName = (event) => {
