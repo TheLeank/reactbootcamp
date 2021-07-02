@@ -12,7 +12,8 @@ const App = () => {
   ]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber] = useState('')
-  const [ personsShown, setPersonsShown ] = useState(persons)
+  // Lo que guardo es el filtro
+  const [ filterText, setFilterText ] = useState('')
 
   const handleAddPerson = (event) => {
     event.preventDefault()
@@ -24,6 +25,7 @@ const App = () => {
   
       setPersons(persons.concat(tempPerson))
       setNewName('')
+      setNewNumber('')
     } else {
       alert(`${newName} is already added to phonebook`)
     }
@@ -38,10 +40,11 @@ const App = () => {
   }
   
   const handleFilter = (event) => {
-    event.target.value.length > 0
-     ? setPersonsShown(persons.filter((person) => person.name.search(new RegExp(event.target.value, "i")) !== -1))
-     : setPersonsShown(persons)
+    setFilterText(event.target.value);
  }
+
+ // Y lo uso aqui para guardar en una const en vez de en otro state
+ const filteredPersons = persons.filter((person) => person.name.search(new RegExp(filterText, "i")) !== -1)
 
   return (
     <div>
@@ -56,7 +59,7 @@ const App = () => {
         handleAdd={handleAddPerson}
       />
       <h2>Numbers</h2>
-      <Persons shown={personsShown} />
+      <Persons shown={filteredPersons} />
     </div>
   )
 }
