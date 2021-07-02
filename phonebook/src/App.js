@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 const App = () => {
   const [ persons, setPersons ] = useState([
@@ -9,7 +12,6 @@ const App = () => {
   ]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber] = useState('')
-  // Creo un nuevo estado para almacenar las personas a mostrar
   const [ personsShown, setPersonsShown ] = useState(persons)
 
   const handleAddPerson = (event) => {
@@ -35,31 +37,26 @@ const App = () => {
     setNewNumber(event.target.value)
   }
   
-  // Seria posible hacer esto con una variable y no con una funcion?
   const handleFilter = (event) => {
-     event.target.value.length > 0
-      ? setPersonsShown(persons.filter((person) => person.name.search(new RegExp(event.target.value, "i")) !== -1))
-      : setPersonsShown(persons)
-  }
+    event.target.value.length > 0
+     ? setPersonsShown(persons.filter((person) => person.name.search(new RegExp(event.target.value, "i")) !== -1))
+     : setPersonsShown(persons)
+ }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      {/* Creo el input y anado un handler */}
-      filter shown with <input type="text" onChange={handleFilter}/>
-      <h2>add a new</h2>
-      <form>
-        <div>
-          name: <input value={newName} onChange={handleNewName} /><br/>
-          number: <input value={newNumber} onChange={handleNewNumber} />
-        </div>
-        <div>
-          <button type="submit" onClick={handleAddPerson}>add</button>
-        </div>
-      </form>
+      <Filter handle={handleFilter} />
+      <h3>add a new</h3>
+      <PersonForm
+        nameValue={newName}
+        numberValue={newNumber}
+        handleName={handleNewName}
+        handleNumber={handleNewNumber}
+        handleAdd={handleAddPerson}
+      />
       <h2>Numbers</h2>
-      {/* Cambio para mostrar el estado personsShown */}
-      {personsShown.map(person => <p key={person.name} >{person.name} {person.number}</p>)}       
+      <Persons shown={personsShown} />
     </div>
   )
 }
