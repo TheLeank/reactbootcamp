@@ -1,19 +1,34 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect } from 'react'
+import axios from 'axios'
 import Note from './components/Note'
-
-const App = (props) => {
-  // Estado usado para almacenar array de notas
-  const [notes, setNotes] = useState(props.notes)
-  // Estado usado para almacenar una nueva nota y concatenarlo al estado notes
+  
+const App = () => {
+  // Inicializar las notas como un array vac'io. Ya no hay props en App que 
+  // hayan sido definidas en index.js
+  const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('a new note...')
-  // Estado para mostrar u ocultar las notas dependiendo de si son importantes
   const [showAll, setShowAll] = useState(true)
 
-  // Handler asociado a un submit, por lo que usamos preventDefault para evitar
-  // que la pagina se refresque al pulsarlo
+  // Se ejecuta primero el componente y, despues, se ejecuta useEffect, que
+  // consta de dos parametros, siendo el primero la funcion o efecto en si
+  // y el segundo, en este caso [], indica la frecuencia con la que se ejecuta
+  // el efecto. Con [] indicamos que se lance unicamente al renderizar el 
+  // componente por primera vez.
+  useEffect(() => {
+    console.log('effect')
+    axios
+      .get('http://localhost:3001/notes')
+      .then(response => {
+        console.log('promise fullfiled');
+        setNotes(response.data)
+      })
+  }, [])
+  // Esta linea se ejecuta primero con 0 notes y, tras renderizarse el comp App
+  // se vuelve a ejecutar, pues App se re-renderiza por el useEffect (creo)
+  console.log('render', notes.length, 'notes');
+  
   const addNote = (event) => {
     event.preventDefault()
-    // Creamos un objeto en el que almacenamos la nueva nota
     const noteObject = {
       content: newNote,
       date: new Date().toISOString(),
@@ -21,8 +36,6 @@ const App = (props) => {
       id: notes.length + 1
     }
 
-    // Anadimos el objeto al estado con las notas usando concat y establecemos
-    // el contenido del input a un string vacio
     setNotes(notes.concat(noteObject))
     setNewNote('')
   }
@@ -32,8 +45,6 @@ const App = (props) => {
     setNewNote(event.target.value)
   }
   
-  // Si el estado showAll es true, almacenamos en notesToShow el contenido del
-  // estado notes. Si es false, almacenamos solo notas con important=true
   const notesToShow = showAll 
     ? notes
     : notes.filter(note => note.important === true)
@@ -42,15 +53,11 @@ const App = (props) => {
     <div>
       <h1>Notes</h1>
       <div>
-        {/* Al pulsar cambiamos showAll al contrario del valor que tenga */}
-        {/* Y, dependiendo de su valor, modificamos el texto del boton */}
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}
         </button>
       </div>
       <ul>
-        {/* Ahora no usamos directamente el estado, sino que usamos la var
-        creada para almacenar todas o solo las notas importantes */}
         {notesToShow.map(note => 
             <Note key={note.id} note={note} />
         )}

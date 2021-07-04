@@ -2,8 +2,6 @@ import React from 'react'
 import Part from './Part'
 
 const Content = ({ content }) => {
-
-    // Intento usar reduce pero no sé cómo es, devuelve NaN
     const totalExercises = content.reduce((sum, current) => {
         return sum.exercises + current.exercises
     })
