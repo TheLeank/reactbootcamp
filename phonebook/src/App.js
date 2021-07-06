@@ -1,19 +1,23 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import axios from 'axios'
 
 const App = () => {
-  const [ persons, setPersons ] = useState([
-    { name: 'Arto Hellas', number: '040-1234567' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ]) 
+  const [ persons, setPersons ] = useState([]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber] = useState('')
-  // Lo que guardo es el filtro
   const [ filterText, setFilterText ] = useState('')
+
+  // Cargamos las notas de manera dinámica usando la librería axios
+  useEffect(() => {
+    axios
+      .get('http://localhost:3002/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
 
   const handleAddPerson = (event) => {
     event.preventDefault()
@@ -43,8 +47,7 @@ const App = () => {
     setFilterText(event.target.value);
  }
 
- // Y lo uso aqui para guardar en una const en vez de en otro state
- const filteredPersons = persons.filter((person) => person.name.search(new RegExp(filterText, "i")) !== -1)
+  const filteredPersons = persons.filter((person) => person.name.search(new RegExp(filterText, "i")) !== -1)
 
   return (
     <div>
@@ -61,7 +64,7 @@ const App = () => {
       <h2>Numbers</h2>
       <Persons shown={filteredPersons} />
     </div>
-  )
+)
 }
 
 export default App
