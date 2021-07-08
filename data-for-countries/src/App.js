@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
+import Country from './components/Country'
 import axios from 'axios'
 
 function App() {
@@ -14,26 +15,9 @@ function App() {
         })
   }, [])
 
-  let show
-  if (filtCountries.length > 10) {
-    show = <p>too many matches, specify another filter</p>
-  } else if (filtCountries.length < 11 && filtCountries.length > 1) {
-    show = filtCountries.map(country => <p key={country.name}>{country.name}</p>)
-  } else {
-    show = filtCountries.map(country =>
-      <div key={country.name}>
-        <h1>{country.name}</h1>
-        <p>capital {country.capital}</p>
-        <p>population {country.population}</p>
-        <h2>languages</h2>
-        <ul>
-          {country.languages.map(l => <li key={l.name}>{l.name}</li>)}
-        </ul>
-        <img src={country.flag} title={country.name + '-flag'} alt={country.name + '-flag image'} width='200px' />
-      </div>
-        
-    )
-  }
+  const handleShow = (props) => {
+    setFiltCountries(countries.filter(c => c.name === props.target.value))
+  } 
 
   return (
     <div>
@@ -41,7 +25,16 @@ function App() {
         countries={countries}
         setFiltCountries={setFiltCountries}
       />
-      {show}
+      {
+        // Operador ternario con varias condiciones (else if).
+        // Siempre ha de acabar : como si fuese un else, y no podrá acabar en
+        // ? como si fuera un else if o da error
+        filtCountries.length === 1 ? <Country country={filtCountries[0]} />
+        : filtCountries.length < 11 ? filtCountries.map(c => 
+          <p key={c.name}>{c.name}<button value={c.name} onClick={handleShow}>show</button></p>
+        )
+        : <p>too many matches, specify another filter</p>
+      }
     </div>
   )
 }
