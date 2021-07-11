@@ -1,6 +1,7 @@
 import React, {useState, useEffect } from 'react'
 import axios from 'axios'
 import Note from './components/Note'
+import noteService from './services/notes'
   
 const App = () => {
   const [notes, setNotes] = useState([])
@@ -9,8 +10,9 @@ const App = () => {
 
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/notes')
+    // Usamos noteService para recuperar las notas
+    noteService
+      .getAll()
       .then(response => {
         setNotes(response.data)
       })
@@ -22,13 +24,13 @@ const App = () => {
       content: newNote,
       date: new Date().toISOString(),
       important: Math.random() < 0.5,
-      // Eliminamos el ID, se encarga el server
     }
 
-    axios
-      .post('http://localhost:3001/notes', noteObject)
+    // Usamos noteService para crear una nota
+    noteService
+      .create(noteObject)
       .then(response => {
-        setNotes(notes.concat(response.data))
+        setNotes(notes.concat(notes, response.data))
         setNewNote('')
       })
   }
@@ -41,20 +43,17 @@ const App = () => {
     ? notes
     : notes.filter(note => note.important === true)
 
-  // url es unica para cada nota
-  // note guarda la nota que queremos cambiar
-  // changedNote guarda la nota con la propiedad !important
   const toggleImportanceOf = id => {
-    const url = `http://localhost:3001/notes/${id}`
     const note = notes.find(n => n.id === id)
     const changedNote = {...note, important: !note.important}
 
-    // Para establecer las notas, se hace un map de las notas actuales y, si no
-    // tienen la id que estamos modificando, la guardamos tal cual, pero si es
-    // la id que estamos modificando, guardamos la respuesta a la peticion
-    axios.put(url, changedNote).then(response => {
-      setNotes(notes.map(note => note.id !== id ? note : response.data))
-    })
+    // Usamos noteService para reemplazar la nota (pues usa PUT y no PATCH)
+    // aunque solo queramos modificar una propiedad
+    noteService
+      .update(id, changedNote)
+      .then(response => {
+        setNotes(notes.map(note => note.id !== id ? note : response.data))
+      })
   }
 
   return (
