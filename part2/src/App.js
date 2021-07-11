@@ -26,11 +26,8 @@ const App = () => {
     }
 
     axios
-      // Hacemos POST del objeto nota, guardando en el server
       .post('http://localhost:3001/notes', noteObject)
       .then(response => {
-        // Asignamos a notas las notas + la nueva nota, que es la respuesta
-        // a la petición realizada
         setNotes(notes.concat(response.data))
         setNewNote('')
       })
@@ -44,6 +41,22 @@ const App = () => {
     ? notes
     : notes.filter(note => note.important === true)
 
+  // url es unica para cada nota
+  // note guarda la nota que queremos cambiar
+  // changedNote guarda la nota con la propiedad !important
+  const toggleImportanceOf = id => {
+    const url = `http://localhost:3001/notes/${id}`
+    const note = notes.find(n => n.id === id)
+    const changedNote = {...note, important: !note.important}
+
+    // Para establecer las notas, se hace un map de las notas actuales y, si no
+    // tienen la id que estamos modificando, la guardamos tal cual, pero si es
+    // la id que estamos modificando, guardamos la respuesta a la peticion
+    axios.put(url, changedNote).then(response => {
+      setNotes(notes.map(note => note.id !== id ? note : response.data))
+    })
+  }
+
   return (
     <div>
       <h1>Notes</h1>
@@ -54,7 +67,12 @@ const App = () => {
       </div>
       <ul>
         {notesToShow.map(note => 
-            <Note key={note.id} note={note} />
+            <Note
+              key={note.id}
+              note={note}
+              // Pasamos la funcion con la id de la nota para cada nota
+              toggleImportance={() => toggleImportanceOf(note.id)}
+            />
         )}
       </ul>
       <form onSubmit={addNote}>
