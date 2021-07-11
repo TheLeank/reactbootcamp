@@ -3,6 +3,8 @@ import axios from 'axios'
 import Note from './components/Note'
 import noteService from './services/notes'
   
+// Modificamos las funciones donde se utiliza noteService para usar la nota o 
+// notas en vez de response.data
 const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('a new note...')
@@ -10,11 +12,10 @@ const App = () => {
 
 
   useEffect(() => {
-    // Usamos noteService para recuperar las notas
     noteService
       .getAll()
-      .then(response => {
-        setNotes(response.data)
+      .then(initialNotes => {
+        setNotes(initialNotes)
       })
   }, [])
 
@@ -26,11 +27,10 @@ const App = () => {
       important: Math.random() < 0.5,
     }
 
-    // Usamos noteService para crear una nota
     noteService
       .create(noteObject)
-      .then(response => {
-        setNotes(notes.concat(notes, response.data))
+      .then(returnedNote => {
+        setNotes(notes.concat(notes, returnedNote))
         setNewNote('')
       })
   }
@@ -47,12 +47,10 @@ const App = () => {
     const note = notes.find(n => n.id === id)
     const changedNote = {...note, important: !note.important}
 
-    // Usamos noteService para reemplazar la nota (pues usa PUT y no PATCH)
-    // aunque solo queramos modificar una propiedad
     noteService
       .update(id, changedNote)
-      .then(response => {
-        setNotes(notes.map(note => note.id !== id ? note : response.data))
+      .then(returnedNote => {
+        setNotes(notes.map(note => note.id !== id ? note : returnedNote))
       })
   }
 
@@ -69,7 +67,6 @@ const App = () => {
             <Note
               key={note.id}
               note={note}
-              // Pasamos la funcion con la id de la nota para cada nota
               toggleImportance={() => toggleImportanceOf(note.id)}
             />
         )}

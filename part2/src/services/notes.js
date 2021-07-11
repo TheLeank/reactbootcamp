@@ -1,20 +1,27 @@
 import axios from 'axios'
 const baseUrl = 'http://localhost:3001/notes'
 
+// Dado que solo usamos response.data, devolvemos directamente response.data
+// En este ejemplo estamos repitiendo codigo, pero posteriormente (creo)
+// veremos como hacerlo mejor aun
 const getAll = () => {
-  return axios.get(baseUrl)
+  const request = axios.get(baseUrl)
+// Ahora no devolvemos la promise devuelta por axios, como antes, sino que 
+// asignamos la promise a request, y devolvemos la llamada al then (que sigue
+// siendo una promise). Si la peticion http es exitosa, se devuelven los datos
+  return request.then(response => response.data)
 }
 
 const create = newObject => {
-  return axios.post(baseUrl, newObject)
+    const request = axios.post(baseUrl, newObject)
+    return request.then(response => response.data)
 }
 
 const update = (id, newObject) => {
-  return axios.put(`${baseUrl}/${id}`, newObject)
+    const request = axios.put(`${baseUrl}/${id}`, newObject)
+    return request.then(response => response.data)
 }
 
-// Devolver un objeto con las 3 funciones para manejar las notas
-// Devuelven promises devueltas por axios
 export default { 
   getAll: getAll, 
   create: create, 
