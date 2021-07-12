@@ -50,6 +50,15 @@ const App = () => {
       .then(returnedNote => {
         setNotes(notes.map(note => note.id !== id ? note : returnedNote))
       })
+      // Usamos catch para tolerar errores que puedan lanzarse al devolverse
+      // una promise no aceptada (e.g. el recurso no existe en el servidor y
+      // estamos tratando de actualizarlo)
+      .catch(error => {
+        alert(
+          `the note '${note.content}' was already deleted from server`
+        )
+        setNotes(notes.filter(n => n.id !== id))
+      })
   }
 
   return (
