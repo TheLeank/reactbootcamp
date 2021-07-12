@@ -3,8 +3,6 @@ import axios from 'axios'
 import Note from './components/Note'
 import noteService from './services/notes'
   
-// Modificamos las funciones donde se utiliza noteService para usar la nota o 
-// notas en vez de response.data
 const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('a new note...')

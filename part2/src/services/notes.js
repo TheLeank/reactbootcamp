@@ -1,14 +1,8 @@
 import axios from 'axios'
 const baseUrl = 'http://localhost:3001/notes'
 
-// Dado que solo usamos response.data, devolvemos directamente response.data
-// En este ejemplo estamos repitiendo codigo, pero posteriormente (creo)
-// veremos como hacerlo mejor aun
 const getAll = () => {
   const request = axios.get(baseUrl)
-// Ahora no devolvemos la promise devuelta por axios, como antes, sino que 
-// asignamos la promise a request, y devolvemos la llamada al then (que sigue
-// siendo una promise). Si la peticion http es exitosa, se devuelven los datos
   return request.then(response => response.data)
 }
 
@@ -22,8 +16,9 @@ const update = (id, newObject) => {
     return request.then(response => response.data)
 }
 
-export default { 
-  getAll: getAll, 
-  create: create, 
-  update: update 
-}
+// Dado que las funciones exportadas en el objeto tienen el mismo nombre en key
+// y en value, podemos simplificar el export
+// Esta forma de escribir el objeto es una nueva caracteristica de ES6, que
+// permite acortar la definicion de objetos cuando usamos el mismo nombre para 
+// key y value
+export default { getAll, create, update }
