@@ -10,7 +10,6 @@ const App = () => {
   const [ newNumber, setNewNumber] = useState('')
   const [ filterText, setFilterText ] = useState('')
 
-  // Cargamos las notas de manera dinámica usando la librería axios
   useEffect(() => {
     axios
       .get('http://localhost:3002/persons')
@@ -27,7 +26,9 @@ const App = () => {
         number: newNumber
       }
   
-      setPersons(persons.concat(tempPerson))
+      axios
+        .post('http://localhost:3002/persons', tempPerson)
+        .then(response => setPersons(persons.concat(response.data)))
       setNewName('')
       setNewNumber('')
     } else {
