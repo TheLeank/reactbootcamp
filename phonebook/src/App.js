@@ -10,7 +10,10 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber] = useState('')
   const [ filterText, setFilterText ] = useState('')
-  const [ notification, setNotification ] = useState(null)
+  const [ notification, setNotification ] = useState({
+    message: null,
+    color: 'green',
+  })
 
   useEffect(() => {
     personsService
@@ -30,9 +33,15 @@ const App = () => {
         .add(tempPerson)
         .then(person => {
           setPersons(persons.concat(person))
-          setNotification(`Added ${person.name}`)
+          setNotification({
+            message: `Added ${person.name}`,
+            color: 'green'
+          })
           setTimeout(() => {
-            setNotification(null)
+            setNotification({
+              ...notification,
+              message: null
+            })
           }, 3000)
           setNewName('')
           setNewNumber('')
@@ -45,6 +54,16 @@ const App = () => {
           .update(p.id, updatedP)
           .then(receivedData => {
             setPersons(persons.map(p => p.name === newName ? receivedData : p))
+          })
+          .catch(error => {
+            setPersons(persons.filter(p => p.name !== newName))
+            setNotification({
+              message: `Information of ${newName} has already been removed from server`,
+              color: 'red'
+            })
+            setTimeout(() => {
+              setNotification({message: null})
+            }, 3000)
           })
       }
     }
@@ -66,8 +85,6 @@ const App = () => {
     person.name.search(new RegExp(filterText, "i")) !== -1)
 
   const removePerson = id => {
-    // Actualizado a find que devuelve el elemento, y no uso filter que devuelve
-    // un array
     const p = persons.find(p => p.id === id)
     if(window.confirm(`Delete ${p.name}?`)) {
       personsService
@@ -87,7 +104,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification message={notification.message} color={notification.color} />
       <Filter handle={handleFilter} />
       <h3>add a new</h3>
       <PersonForm
