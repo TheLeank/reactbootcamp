@@ -51,6 +51,23 @@ const App = () => {
   const filteredPersons = persons.filter((person) => 
     person.name.search(new RegExp(filterText, "i")) !== -1)
 
+  const removePerson = id => {
+    const p = persons.filter(p => p.id === id)
+    if(window.confirm(`Delete ${p[0].name}?`)) {
+      personsService
+        .del(id)
+        .then(response => {
+          personsService
+            .getAll()
+            .then(initialPersons => setPersons(initialPersons))
+        })
+        .catch(error => {
+          alert(`the person with id ${id} was already deleted from server`)
+          setPersons(persons.filter(p => p.id !== id))
+      })
+    }
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -64,7 +81,18 @@ const App = () => {
         handleAdd={handleAddPerson}
       />
       <h2>Numbers</h2>
-      <Persons shown={filteredPersons} />
+      {/* Siempre usar map fuera del componente, de lo contrario no podría usar
+      las propiedades del objeto a la hora de llamar a funciones declaradas en
+      este mismo fichero */}
+      {
+        filteredPersons.map(person =>
+          <Persons 
+            key={person.id} 
+            person={person} 
+            remove={() => removePerson(person.id)}
+          />
+        )
+      }
     </div>
 )
 }

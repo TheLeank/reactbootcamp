@@ -1,7 +1,14 @@
 import React from 'react'
 
-const Persons = ({ shown }) => (
-    <>{shown.map(person => <p key={person.name} >{person.name} {person.number}</p>)}</>    
+const Persons = ({ person, remove }) => (
+    <>
+        {
+            <p key={person.name} >
+                {person.name} {person.number}
+                <button onClick={remove} >delete</button>
+            </p>
+        }
+    </>    
 )
 
 export default Persons
