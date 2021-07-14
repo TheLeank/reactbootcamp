@@ -32,7 +32,15 @@ const App = () => {
           setNewNumber('')
         })
     } else {
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`${newName} is already added to phonebook. Replace old number with a new one?`)) {
+        const p = persons.find(p => p.name === newName)
+        const updatedP = {...p, number: newNumber}
+        personsService
+          .update(p.id, updatedP)
+          .then(receivedData => {
+            setPersons(persons.map(p => p.name === newName ? receivedData : p))
+          })
+      }
     }
   }
 
@@ -52,8 +60,10 @@ const App = () => {
     person.name.search(new RegExp(filterText, "i")) !== -1)
 
   const removePerson = id => {
-    const p = persons.filter(p => p.id === id)
-    if(window.confirm(`Delete ${p[0].name}?`)) {
+    // Actualizado a find que devuelve el elemento, y no uso filter que devuelve
+    // un array
+    const p = persons.find(p => p.id === id)
+    if(window.confirm(`Delete ${p.name}?`)) {
       personsService
         .del(id)
         .then(response => {
@@ -81,9 +91,6 @@ const App = () => {
         handleAdd={handleAddPerson}
       />
       <h2>Numbers</h2>
-      {/* Siempre usar map fuera del componente, de lo contrario no podría usar
-      las propiedades del objeto a la hora de llamar a funciones declaradas en
-      este mismo fichero */}
       {
         filteredPersons.map(person =>
           <Persons 

@@ -16,4 +16,9 @@ const del = (id) => {
     return request.then(response => response)
 }
 
-export default { getAll, add, del }
+const update = (id, person) => {
+    const request = axios.patch(`${baseurl}/${id}`, person)
+    return request.then(response => response.data)
+}
+
+export default { getAll, add, del, update }
