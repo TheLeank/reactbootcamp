@@ -1,13 +1,35 @@
 import React, {useState, useEffect } from 'react'
 import axios from 'axios'
 import Note from './components/Note'
+import Notification from './components/Notification'
 import noteService from './services/notes'
-  
+
+// Creamos este componente para mostrar cómo aplicar estilos css inline,
+// teniendo estos forma de objeto, convirtiendo las propiedades con guión, como
+// font-style a camelCase, fontStyle
+const Footer = () => {
+  const footerStyle = {
+    color: 'green',
+    fontStyle: 'italic',
+    fontSize: 16
+  }
+
+  return (
+    // Añadimos el objeto a la propiedad style
+    <div style={footerStyle}>
+      <br />
+      <em>
+        Note app, Department of Computer Science, University of Helsinki 2021
+      </em>
+    </div>
+  )
+}
+
 const App = () => {
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState('a new note...')
   const [showAll, setShowAll] = useState(true)
-
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     noteService
@@ -50,13 +72,15 @@ const App = () => {
       .then(returnedNote => {
         setNotes(notes.map(note => note.id !== id ? note : returnedNote))
       })
-      // Usamos catch para tolerar errores que puedan lanzarse al devolverse
-      // una promise no aceptada (e.g. el recurso no existe en el servidor y
-      // estamos tratando de actualizarlo)
       .catch(error => {
-        alert(
-          `the note '${note.content}' was already deleted from server`
+        // Si la nota no existe en el servidor, mostramos este mensaje, que
+        // se ocultará en 5 segundos
+        setErrorMessage(
+          `Note '${note.content}' was already removed from server`
         )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
         setNotes(notes.filter(n => n.id !== id))
       })
   }
@@ -64,6 +88,7 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
+      <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}
@@ -85,6 +110,7 @@ const App = () => {
           />
           <button type="submit">save</button>
       </form>
+      <Footer />
     </div>
   )
 }
