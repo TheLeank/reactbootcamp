@@ -1,0 +1,12 @@
+# Get all notes
+GET http://localhost:3001/api/notes
+
+###
+# Create new note
+POST http://localhost:3001/api/notes
+content-type: application/json
+
+{
+    "content": "Mi notilla",
+    "important": true 
+}
