@@ -1,4 +1,7 @@
-const http = require('http')
+// Ahora usamos express, un framework para Nodejs que abstrae el uso del
+// módulo http, que es necesario para crear un backend (o algo así)
+const express = require('express')
+const app = express()
 
 let notes = [
     {
@@ -21,9 +24,16 @@ let notes = [
     }
 ]
 
-const app = http.createServer((request, response) => {
-    response.writeHead(200, { 'Content-Type': 'application/json' })
-    response.end(JSON.stringify(notes))
+// Get recibe un event handler para las peticiones HTTP GET a /, que recibe dos 
+// params: request, y response. El primero contiene la información de la
+// petición http, y el segundo se usa para definir cómo se responde a esa 
+// petición
+app.get('/', (request, response) => {
+    response.send('<h1>Hello World!</h1>')
+})
+  
+app.get('/api/notes', (request, response) => {
+    response.json(notes)
 })
 
 const PORT = 3001
