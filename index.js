@@ -1,5 +1,3 @@
-// Ahora usamos express, un framework para Nodejs que abstrae el uso del
-// módulo http, que es necesario para crear un backend (o algo así)
 const express = require('express')
 const app = express()
 
@@ -24,10 +22,6 @@ let notes = [
     }
 ]
 
-// Get recibe un event handler para las peticiones HTTP GET a /, que recibe dos 
-// params: request, y response. El primero contiene la información de la
-// petición http, y el segundo se usa para definir cómo se responde a esa 
-// petición
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
@@ -37,20 +31,24 @@ app.get('/api/notes', (request, response) => {
 })
 
 app.get('/api/notes/:id', (request, response) => {
-    // Definimos como number el parámetro, de lo contrario lo coge como string
-    // y da error al usar ===
     const id = Number(request.params.id)
     const note = notes.find(note => note.id === id)
     
-    // Si visitamos una id de nota que no existe, igualmente nos devuelve código
-    // 200 con un content length de 0. Lo arreglamos con este condicional, el 
-    // cuál devuelve código 404 en caso de no encontrar el recurso (devolvería 
-    // undefined, cuyo valor boolean es false)
     if (note) {
         response.json(note)
     } else {
         response.status(404).end()
     }
+})
+
+// Si existe el recurso, se devuelve un nuevo array de notas sin la nota cuya id
+// hemos pasado. Si se borra, o incluso no existe, se devuelve un 204 (aunque
+// lo suyo sería devolver 404 si no existe)
+app.delete('/api/notes/:id', (request, response) => {
+    const id = Number(request.params.id)
+    notes = notes.filter(note => note.id !== id)
+  
+    response.status(204).end()
 })
 
 const PORT = 3001
