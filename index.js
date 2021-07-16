@@ -36,6 +36,23 @@ app.get('/api/notes', (request, response) => {
     response.json(notes)
 })
 
+app.get('/api/notes/:id', (request, response) => {
+    // Definimos como number el parámetro, de lo contrario lo coge como string
+    // y da error al usar ===
+    const id = Number(request.params.id)
+    const note = notes.find(note => note.id === id)
+    
+    // Si visitamos una id de nota que no existe, igualmente nos devuelve código
+    // 200 con un content length de 0. Lo arreglamos con este condicional, el 
+    // cuál devuelve código 404 en caso de no encontrar el recurso (devolvería 
+    // undefined, cuyo valor boolean es false)
+    if (note) {
+        response.json(note)
+    } else {
+        response.status(404).end()
+    }
+})
+
 const PORT = 3001
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
