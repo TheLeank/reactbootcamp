@@ -51,16 +51,9 @@ app.delete('/api/notes/:id', (request, response) => {
     response.status(204).end()
 })
 
-// Anteriormente comprobamos que las notas se recibían correctamente en el
-// backend. Ahora la guardaremos calculando la id única.
 app.post('/api/notes', (request, response) => {
-    // El body es requerido al crear una nota, por tanto devolvemos error
-    // si en el body no hay contenido, algo que antes no hacíamos
-    // El código 400 es bad request
     const body = request.body
     if (!body.content) {
-        // Especial atención al return, que hace que la ejecución se detenga y
-        // no se malforme y guarde un objeto no válido
         return response.status(400).json({ 
           error: 'content missing' 
         })
@@ -68,14 +61,8 @@ app.post('/api/notes', (request, response) => {
 
     const note = {
         content: body.content,
-        // Si en body existe important, será la que traiga el objeto (sea true 
-        // o false), en caso contrario, será false
         important: body.important || false,
-        // Generamos la fecha usando el backend, de manera que nos aseguramos
-        // el usar una fecha correcta, ya que si se genera en el navegador nos
-        // exponemos a que el usuario no tenga una fecha bien definida
         date: new Date(),
-        // Usamos el método definido para generar la nueva id
         id: generateId(),
     }
 
@@ -83,14 +70,18 @@ app.post('/api/notes', (request, response) => {
     response.json(note)
 })
 
-// Sacamos la id más alta que existe actualmente en las notas y la guardamos
-// No es un método recomendado, pero por ahora nos vale
+// Cuando no hay coincidencia entre las rutas y una petición get, se muestra
+// este error. En este caso usamos un middleware, que son funciones usadas para
+// procesar los objetos request, que reciben 3 params: request.method,
+// request.path y request.body
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
 const generateId = () => {
     const maxId = notes.length > 0
-        // notes.map(n => n.id) devuelve un array con todas las notas, pero 
-        // Math.max ha de trabajar con números directamente, y no con un array
-        // con números. Usando el spread operator estamos devolviendo únicamente
-        // la id de la nota, como número, y no un array. 
         ? Math.max(...notes.map(n => n.id))
         : 0
     return maxId + 1
