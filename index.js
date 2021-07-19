@@ -1,8 +1,9 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
 
-// Activamos el parser de json
 app.use(express.json())
+app.use(cors())
 
 let notes = [
     {
