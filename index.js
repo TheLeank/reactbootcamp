@@ -3,6 +3,10 @@ const cors = require('cors')
 const app = express()
 
 app.use(express.json())
+// Al recibir una petición HTTP GET, express ahora comprobará si en el 
+// directorio build existe un fichero correspondiente a la dirección de la 
+// petición y lo devolverá.
+app.use(express.static('build'))
 app.use(cors())
 
 let notes = [
@@ -71,10 +75,6 @@ app.post('/api/notes', (request, response) => {
     response.json(note)
 })
 
-// Cuando no hay coincidencia entre las rutas y una petición get, se muestra
-// este error. En este caso usamos un middleware, que son funciones usadas para
-// procesar los objetos request, que reciben 3 params: request.method,
-// request.path y request.body
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
