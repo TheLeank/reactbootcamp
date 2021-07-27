@@ -1,12 +1,17 @@
-# Get all notes
+### Get all notes
 GET http://localhost:3001/api/notes
 
-###
-# Create new note
+### Get single note
+GET http://localhost:3001/api/notes/60fe832de759ee398c0d7d15
+
+### Create new note
 POST http://localhost:3001/api/notes
 content-type: application/json
 
 {
-    "content": "Mi notilla",
+    "content": "Note created from vscode rest-client extension",
     "important": true 
 }
+
+### Delete a note
+DELETE http://localhost:3001/api/notes/60ffe06f7ef88f4cc6e1eebf
