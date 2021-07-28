@@ -1,11 +1,15 @@
 require('dotenv').config()
 const express = require('express')
-const cors = require('cors')
 const app = express()
+const cors = require('cors')
 const Note = require('./models/note')
 
-app.use(express.json())
+// el orden en que se llama al middleware con app.use() es muy importante, ya
+// que es ese orden en el que se ejecutan los middlewares
+// si, por ejemplo, cargamos express.json() después de un app.get, el body
+// estaría vacío ya que el contenido nos llega como json (creo)
 app.use(express.static('build'))
+app.use(express.json())
 app.use(cors())
 
 let notes = [
@@ -35,18 +39,15 @@ app.get('/api/notes', (request, response) => {
     })
 })
 
-app.get('/api/notes/:id', (request, response) => {
+// http://expressjs.com/en/guide/writing-middleware.html#mw-fig
+// pasamos como tercer argumento next
+app.get('/api/notes/:id', (request, response, next) => {
     Note.findById(request.params.id)
     .then(note => {
-        // Si la nota existe, se devuelve, si no, se envia un 404
         note ? response.json(note) : response.status(404).end()
     })
-    // Si se produce un error (e.g. se envía como id un string) se muestra
-    // el error y se envía el código correspondiente
-    .catch(err => {
-        console.log(err)
-        response.status(400).send({ error: 'malformed id' })
-    })
+    // Usamos next para pasar el error al middleware errorhandler
+    .catch(err => next(err))
 })
 
 app.delete('/api/notes/:id', (request, response) => {
@@ -84,6 +85,25 @@ const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
 app.use(unknownEndpoint)
+
+// Escribimos el errorHandler
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+    
+    // si identificamos el tipo de error, en este caso CastError, podemos 
+    // enviar una respuesta al cliente que ayude a solucionar el error
+    if (error.name === 'CastError') {
+      return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    // si no es un CastError, pasamos el error al siguiente middleware de 
+    // express
+    next(error)
+}
+  
+// tiene que ser el último middleware cargado, porque al usar next en el error
+// handler que tenemos justo arriba, nos cargará este middleware
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
