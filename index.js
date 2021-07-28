@@ -1,4 +1,3 @@
-// Importar la config de dotenv
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
@@ -30,17 +29,23 @@ let notes = [
     }
 ]
 
-// Devuelve todas las notas
 app.get('/api/notes', (request, response) => {
     Note.find({}).then(notes => {
         response.json(notes)    
     })
 })
 
-// Devolver una nota buscando por id, usando findById de mongoose
 app.get('/api/notes/:id', (request, response) => {
-    Note.findById(request.params.id).then(note => {
-        response.json(note)
+    Note.findById(request.params.id)
+    .then(note => {
+        // Si la nota existe, se devuelve, si no, se envia un 404
+        note ? response.json(note) : response.status(404).end()
+    })
+    // Si se produce un error (e.g. se envía como id un string) se muestra
+    // el error y se envía el código correspondiente
+    .catch(err => {
+        console.log(err)
+        response.status(400).send({ error: 'malformed id' })
     })
 })
 
@@ -57,7 +62,6 @@ app.post('/api/notes', (request, response) => {
         return response.status(400).json({ error: 'content missing' })
     }
 
-    // Creamos la nota usando el constructor del model
     const note = new Note({
         content: body.content,
         important: body.important || false,
@@ -65,9 +69,6 @@ app.post('/api/notes', (request, response) => {
     })
 
     note.save().then(savedNote => {
-        // Responder con la nota solo si se ha guardado, usando response dentro
-        // de la función callback de save(). Se mostrará el objeto con el
-        // formato definido en su modelo
         response.json(savedNote)
     })
 })
@@ -84,8 +85,6 @@ const unknownEndpoint = (request, response) => {
 }
 app.use(unknownEndpoint)
 
-
-// Acceder a las variables declaradas en dotenv como si fuesen vars de entorno
 const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
