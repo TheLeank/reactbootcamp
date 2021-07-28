@@ -13,5 +13,14 @@ content-type: application/json
     "important": true 
 }
 
+### Modify a note
+PUT http://localhost:3001/api/notes/60fe832de759ee398c0d7d15
+content-type: application/json
+
+{
+    "content": "HTML is easy",
+    "important": true
+}
+
 ### Delete a note
 DELETE http://localhost:3001/api/notes/60ffe06f7ef88f4cc6e1eebf

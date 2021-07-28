@@ -4,10 +4,6 @@ const app = express()
 const cors = require('cors')
 const Note = require('./models/note')
 
-// el orden en que se llama al middleware con app.use() es muy importante, ya
-// que es ese orden en el que se ejecutan los middlewares
-// si, por ejemplo, cargamos express.json() después de un app.get, el body
-// estaría vacío ya que el contenido nos llega como json (creo)
 app.use(express.static('build'))
 app.use(express.json())
 app.use(cors())
@@ -39,21 +35,24 @@ app.get('/api/notes', (request, response) => {
     })
 })
 
-// http://expressjs.com/en/guide/writing-middleware.html#mw-fig
-// pasamos como tercer argumento next
 app.get('/api/notes/:id', (request, response, next) => {
     Note.findById(request.params.id)
     .then(note => {
         note ? response.json(note) : response.status(404).end()
     })
-    // Usamos next para pasar el error al middleware errorhandler
     .catch(err => next(err))
 })
 
-app.delete('/api/notes/:id', (request, response) => {
-    Note.deleteOne({ _id: request.params.id }).then(response => {
-        console.log(response)
-    })
+app.delete('/api/notes/:id', (request, response, next) => {
+    Note.findByIdAndRemove(request.params.id)
+        .then(result => {
+            // devuelvo 204 siempre que la petición sea correcta, pero esto no
+            // quiere decir que realmente se haya borrado una nota, para eso 
+            // usaríamos el param result
+            response.status(204).end()
+        })
+        // si ocurre algún error, lo pasamos al siguiente middleware
+        .catch(err => next(err))
 })
 
 app.post('/api/notes', (request, response) => {
@@ -74,6 +73,28 @@ app.post('/api/notes', (request, response) => {
     })
 })
 
+// escribimos este método para cambiar la importancia de las notas
+// también se permite cambiar el contenido, pero no la fecha de creación, por
+// razones obvias
+app.put('/api/notes/:id', (req, res, next) => {
+    const body = req.body
+
+    const note = {
+        content: body.content,
+        important: body.important,
+    }
+
+    // se envía como parámetro un json, y no una nueva nota, porque updatedNote
+    // por defecto recibe el valor original del documento, sin modificaciones
+    // el añadir { new: true } causa que el event handler sea llamado con el 
+    // documento modificado
+    Note.findByIdAndUpdate(req.params.id, note, { new: true })
+        .then(updatedNote => {
+            res.json(updatedNote)
+        })
+        .catch(err => next(err))
+})
+
 const generateId = () => {
     const maxId = notes.length > 0
         ? Math.max(...notes.map(n => n.id))
@@ -86,23 +107,16 @@ const unknownEndpoint = (request, response) => {
 }
 app.use(unknownEndpoint)
 
-// Escribimos el errorHandler
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
     
-    // si identificamos el tipo de error, en este caso CastError, podemos 
-    // enviar una respuesta al cliente que ayude a solucionar el error
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
     }
 
-    // si no es un CastError, pasamos el error al siguiente middleware de 
-    // express
     next(error)
 }
   
-// tiene que ser el último middleware cargado, porque al usar next en el error
-// handler que tenemos justo arriba, nos cargará este middleware
 app.use(errorHandler)
 
 const PORT = process.env.PORT
