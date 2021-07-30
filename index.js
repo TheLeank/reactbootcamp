@@ -46,36 +46,27 @@ app.get('/api/notes/:id', (request, response, next) => {
 app.delete('/api/notes/:id', (request, response, next) => {
     Note.findByIdAndRemove(request.params.id)
         .then(result => {
-            // devuelvo 204 siempre que la petición sea correcta, pero esto no
-            // quiere decir que realmente se haya borrado una nota, para eso 
-            // usaríamos el param result
             response.status(204).end()
         })
-        // si ocurre algún error, lo pasamos al siguiente middleware
         .catch(err => next(err))
 })
 
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
     const body = request.body
-
-    if (body.content === undefined) {
-        return response.status(400).json({ error: 'content missing' })
-    }
 
     const note = new Note({
         content: body.content,
         important: body.important || false,
-        date: new Date(),
+        date: new Date()
     })
 
-    note.save().then(savedNote => {
-        response.json(savedNote)
-    })
+    note.save()
+        .then(savedNote => {
+            response.json(savedNote.toJSON())
+        })
+        .catch(error => next(error))
 })
 
-// escribimos este método para cambiar la importancia de las notas
-// también se permite cambiar el contenido, pero no la fecha de creación, por
-// razones obvias
 app.put('/api/notes/:id', (req, res, next) => {
     const body = req.body
 
@@ -84,23 +75,12 @@ app.put('/api/notes/:id', (req, res, next) => {
         important: body.important,
     }
 
-    // se envía como parámetro un json, y no una nueva nota, porque updatedNote
-    // por defecto recibe el valor original del documento, sin modificaciones
-    // el añadir { new: true } causa que el event handler sea llamado con el 
-    // documento modificado
     Note.findByIdAndUpdate(req.params.id, note, { new: true })
         .then(updatedNote => {
             res.json(updatedNote)
         })
         .catch(err => next(err))
 })
-
-const generateId = () => {
-    const maxId = notes.length > 0
-        ? Math.max(...notes.map(n => n.id))
-        : 0
-    return maxId + 1
-}
 
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
@@ -111,7 +91,9 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
     
     if (error.name === 'CastError') {
-      return response.status(400).send({ error: 'malformatted id' })
+        return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)

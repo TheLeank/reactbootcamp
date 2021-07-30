@@ -9,7 +9,7 @@ POST http://localhost:3001/api/notes
 content-type: application/json
 
 {
-    "content": "Note created from vscode rest-client extension",
+    "content": "lol",
     "important": true 
 }
 

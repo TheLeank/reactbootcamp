@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-// Coger la url del .env
 const url = process.env.MONGODB_URI
 
 console.log('connecting to', url)
@@ -13,14 +12,22 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
         console.log('error connecting to MongoDB:', error.message)
     })
 
-// Definición del constructor
+// definición del constructor, en el que cada propiedad es un objeto, de manera
+// que podemos validar el contenido en la declaración del modelo sin necesidad
+// de controlarlo en los route handlers
 const noteSchema = new mongoose.Schema({
-    content: String,
-    date: Date,
+    content: {
+        type: String,
+        minLength: 5,
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    },
     important: Boolean,
 })
 
-// Modificar la función toJSON del schema para formatear el objeto al devolverlo
 noteSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
@@ -29,5 +36,4 @@ noteSchema.set('toJSON', {
     }
 })
 
-// Exportar el modelo con nombre Note y asignamos el constructor
 module.exports = mongoose.model('Note', noteSchema)
