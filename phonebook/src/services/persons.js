@@ -17,7 +17,7 @@ const del = (id) => {
 }
 
 const update = (id, person) => {
-    const request = axios.patch(`${baseurl}/${id}`, person)
+    const request = axios.put(`${baseurl}/${id}`, person)
     return request.then(response => response.data)
 }
 
