@@ -60,10 +60,12 @@ app.post('/api/notes', (request, response, next) => {
         date: new Date()
     })
 
+    // encadenado de promises, en el que el primer then, que recibe un objeto
+    // devuelto por mongoose, lo formatea y lo pasa al segundo then, que lo
+    // devuelve al cliente
     note.save()
-        .then(savedNote => {
-            response.json(savedNote.toJSON())
-        })
+        .then(savedNote => savedNote.toJson())
+        .then(savedAndFormattedNote => {response.json(savedAndFormattedNote)})
         .catch(error => next(error))
 })
 
