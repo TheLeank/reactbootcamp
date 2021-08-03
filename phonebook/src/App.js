@@ -46,6 +46,18 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        .catch(err => {
+          setNotification({
+            message: `${err.response.data}`,
+            color: 'red'
+          })
+          setTimeout(() => {
+            setNotification({
+              ...notification,
+              message: null
+            })
+          }, 3000)
+        })
     } else {
       if (window.confirm(`${newName} is already added to phonebook. Replace old number with a new one?`)) {
         const p = persons.find(p => p.name === newName)
@@ -56,9 +68,9 @@ const App = () => {
             setPersons(persons.map(p => p.name === newName ? receivedData : p))
           })
           .catch(error => {
-            setPersons(persons.filter(p => p.name !== newName))
+            // setPersons(persons.filter(p => p.name !== newName))
             setNotification({
-              message: `Information of ${newName} has already been removed from server`,
+              message: `${error.response.data}`,
               color: 'red'
             })
             setTimeout(() => {
