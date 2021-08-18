@@ -1,5 +1,4 @@
-// este fichero lo uso para crear las funciones que usaré en los tests, que 
-// realmente no existe puesto serán las propias funciones de mi código
+const _ = require('lodash')
 const dummy = (blogs) => {
   return 1
 }
@@ -22,8 +21,23 @@ const favoriteBlog = (blogs) => {
   })
 }
 
+const mostBlogs = (blogs) => {
+  // los agrupo por autor
+  const grouped = _.groupBy(blogs, 'author')
+  // guardo el objeto del autor cuyo numero de elementos es mayor
+  const author = _.reduce(grouped, (max, blog) => {
+    return _.size(blog) >=_.size(max)
+      ? blog
+      : max
+    })
+    // con sample devuelvo un elemento aleatorio de la colección, y uso su prop
+    // author
+    return { 'author': _.sample(author).author, 'blogs': _.size(author) }
+}
+
 module.exports = {
   dummy,
   totalLikes,
-  favoriteBlog
+  favoriteBlog,
+  mostBlogs
 }
