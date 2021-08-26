@@ -9,10 +9,17 @@ const Note = require('../models/note')
 
 beforeEach(async () => {
   await Note.deleteMany({})
-  let noteObject = new Note(helper.initialNotes[0])
-  await noteObject.save()
-  noteObject = new Note(helper.initialNotes[1])
-  await noteObject.save()
+
+  // creo un array de objetos Note de Mongoose
+  const noteObjects = helper.initialNotes
+    .map(note => new Note(note))
+  // guardo las promises generadas al guardar las notas
+  const promiseArray = noteObjects.map(note => note.save())
+  // este método transforma todas las promises de un array en una promise, que
+  // será completada cuando cada promise del array sea resuelta. Las promises
+  // son ejecutadas de forma paralela, por lo que si es necesario ejecutarlas en
+  // un orden, habría que usar un for...of
+  await Promise.all(promiseArray)
 })
 
 test('notes are returned as json', async () => {
