@@ -1,4 +1,3 @@
-// importo el modulo o módulos donde se encuentran las funciones a comprobar
 const listHelper = require('../utils/list_helper')
 
 test('dummy returns one', () => {
@@ -8,21 +7,14 @@ test('dummy returns one', () => {
   expect(result).toBe(1)
 })
 
-// creo un bloque donde comprobaré que mi función totalLikes es capaz de dar
-// el resultado correcto en diferentes situaciones.
 describe('total likes', () => {
 
-  // como cuando la lista de blogs está vacía
   test('of empy list is zero', () => {
-    // utilizo una variable local blogs para que el contenido de los tests no
-    // varíe, y le pongo el contenido que corresponda al test. En este caso,
-    // un array vacío
     const blogs = []
     const result = listHelper.totalLikes(blogs)
     expect(result).toBe(0)
   })
 
-  // solo hay un blog
   test('when list has only one blog equals the likes of that', () => {
     const blogs = [
       {
@@ -38,7 +30,6 @@ describe('total likes', () => {
     expect(result).toBe(7)
   })
 
-  // hay varios blogs
   test('of a bigger list is calculated right', () => {
     const blogs = [
       {
