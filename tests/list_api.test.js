@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const helper = require('./helper_functions')
 
 const initialBlogs = [
   {
@@ -46,6 +47,27 @@ test('3 blogs are returned in JSON', async () => {
 test('blog has id property', async () => {
   const response = await api.get('/api/blog')
   expect(response.body[0].id).toBeDefined()
+})
+
+test('blog is created', async () => {
+  const newBlog = {
+    title: 'Succesfully added',
+    author: 'Jacobo Rodriguez',
+    url: 'succesfully-added',
+    likes: 0
+  }
+  
+  await api
+    .post('/api/blog')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-type', /application\/json/)
+
+  const b = await Blog.find({ title: 'Succesfully added' })
+  expect(b[0].title).toEqual('Succesfully added')
+
+  const blogsAtEnd = await helper.blogsInDb() 
+  expect(blogsAtEnd).toHaveLength(initialBlogs.length + 1)
 })
 
 afterAll(() => {
