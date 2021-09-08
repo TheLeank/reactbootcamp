@@ -1,9 +1,12 @@
 const mongoose = require('mongoose')
-
+const uniqueValidator = require('mongoose-unique-validator')
 // creamos el modelo que define un usuario, en el que usamos la propiedad
 // 'notes' para almacenar las id de las notas creadas por el usuario
 const userSchema = new mongoose.Schema({
-  username: String,
+  username: {
+    type: String,
+    unique: true
+  },
   name: String,
   passwordHash: String,
   notes: [
@@ -13,6 +16,8 @@ const userSchema = new mongoose.Schema({
     }
   ]
 })
+
+userSchema.plugin(uniqueValidator)
 
 userSchema.set('toJSON', {
   transform: (document, returnedObject) => {
