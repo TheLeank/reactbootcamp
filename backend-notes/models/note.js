@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+// añadimos la propiedad 'user' para almacenar la referencia al usuario
+// propietario de dicha nota
 const noteSchema = new mongoose.Schema({
   content: {
     type: String,
@@ -11,6 +13,10 @@ const noteSchema = new mongoose.Schema({
     required: true,
   },
   important: Boolean,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 noteSchema.set('toJSON', {
