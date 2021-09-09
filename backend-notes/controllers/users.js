@@ -3,10 +3,10 @@ const usersRouter = require('express').Router()
 const User = require('../models/user')
 
 usersRouter.get('/', async (request, response) => {
-  // mostrar el contenido de las notas, y no solo la id, al hacer el get
-  // de todos los usuarios. la funcion populate hace de "join", el cuál no
-  // existe realmente en mongodb
-  const users = await User.find({}).populate('notes')
+  const users = await User
+    .find({})
+    // podemos filtrar las propiedades de Note que queremos mostrar
+    .populate('notes', { content: 1, date: 1 })
   response.json(users)
 })
 
