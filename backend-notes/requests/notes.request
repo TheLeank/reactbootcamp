@@ -9,8 +9,9 @@ POST http://localhost:3001/api/notes
 content-type: application/json
 
 {
-    "content": "lol",
-    "important": true 
+    "content": "Contenido de nueva nota, segunda",
+    "important": true,
+    "userId": "6138f1763be6be997b8aa7e4"
 }
 
 ### Modify a note
