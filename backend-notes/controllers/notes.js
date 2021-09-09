@@ -1,9 +1,8 @@
 const notesRouter = require('express').Router()
 const Note = require('../models/note')
+// incluimos el usuario
+const User = require('../models/user')
 
-// para no encadenar varios .then podemos usar async / await, de esta manera
-// el código queda más legible y evitamos un http://callbackhell.com
-// en este ejemplo no se nota mucho, pero en el enlace superior se aprecia mejor
 notesRouter.get('/', async (request, response) => {
   const notes = await Note.find({})
   response.json(notes)
@@ -20,14 +19,22 @@ notesRouter.get('/:id', async (request, response) => {
 
 notesRouter.post('/', async (request, response) => {
   const body = request.body
-
+  // guardamos el usuario, cuya id encontramos en el request.body
+  const user = await User.findById(body.userId)
+  
+  // añadimos el user a la nota
   const note = new Note({
     content: body.content,
     important: body.important || false,
-    date: new Date()
+    date: new Date(),
+    user: user._id
   })
 
   const savedNote = await note.save()
+  // además de guardar la nota, actualizamos el array de notas del usuario
+  user.notes = user.notes.concat(savedNote._id)
+  await user.save()
+  
   response.json(savedNote)
 })
 
