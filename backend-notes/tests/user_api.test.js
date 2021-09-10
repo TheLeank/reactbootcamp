@@ -1,5 +1,9 @@
+const app = require('../app')
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
+const supertest = require('supertest')
+const helper = require('./test_helper')
+const api = supertest(app)
 
 describe('when there is initially one user in db', () => {
   beforeEach(async () => {
