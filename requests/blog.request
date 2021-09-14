@@ -8,7 +8,7 @@ Content-Type: application/json
 {
   "title": "New entry",
   "author": "Jacobo",
-  "likes": 0,
+  "likes": 3,
   "url": "new-entry"
 }
 
@@ -29,5 +29,5 @@ Content-Type: application/json
 
 {
   "likes": 0,
-  "url": "new-entry"
+  "url": "new-exercise"
 }
