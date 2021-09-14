@@ -22,3 +22,12 @@ Content-Type: application/json
 {
   "likes": 288
 }
+
+###
+POST http://localhost:3003/api/blog
+Content-Type: application/json
+
+{
+  "likes": 0,
+  "url": "new-entry"
+}
