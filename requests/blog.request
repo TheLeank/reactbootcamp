@@ -4,12 +4,14 @@ GET http://localhost:3003/api/blog
 ###
 POST http://localhost:3003/api/blog
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImphY29ibyIsImlkIjoiNjE0MGFlYTY3ZmI4YWU5N2FmMjQ5ZjkyIiwiaWF0IjoxNjMxNjk3Nzg0fQ.cqvizJcvHwCgn7ayoxU442VxP02IbciFeClE7OmYy1g
 
 {
-  "title": "New entry",
-  "author": "Jacobo",
+  "title": "Using token auth to create blogs",
+  "author": "Jacobo Rodriguez",
   "likes": 3,
-  "url": "new-entry"
+  "url": "new-entry",
+  "user": "jacobo"
 }
 
 ###
