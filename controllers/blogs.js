@@ -1,7 +1,5 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
-const jwt = require('jsonwebtoken')
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({})
@@ -10,13 +8,7 @@ blogRouter.get('/', async (request, response) => {
 })
 
 blogRouter.post('/', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token missing or invalid' })
-  }
-
-  const user = await User.findById(decodedToken.id)
+  const user = request.user
   
   const blog = new Blog({
     title: request.body.title,
@@ -33,20 +25,16 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.delete('/:id', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token missing or invalid' })
-  }
-
+  const user = request.user
   const blog = await Blog.findById(request.params.id)
-  if (blog.user.toJSON() === decodedToken.id) {
+
+  if (blog.user.toJSON() === user.id) {
     await Blog.remove(blog)
     response.status(204).end()
   } else {
     response.status(401).end()
   }
-  
+  // falta eliminar la id del blog del array de posts del usuario
 })
 
 blogRouter.put('/:id', async (req, res) => {
